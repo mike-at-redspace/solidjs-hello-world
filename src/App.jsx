@@ -2,35 +2,33 @@ import { createSignal, Suspense, Switch, Match, useTransition } from "solid-js";
 import Content from "./elements/Content";
 
 const App = () => {
-  const [tab, setTab] = createSignal(0);
+  const [tab, setTab] = createSignal('one');
   const [pending, start] = useTransition();
   const updateTab = (index) => () => start(() => setTab(index));
+
+  const tabs = [
+    { name: 'one', label: 'Tab One' },
+    { name: 'two', label: 'Tab Two' },
+    { name: 'three', label: 'Tab Three' }
+  ];
 
   return (
     <>
       <ul class="inline">
-        <li classList={{ selected: tab() === 0 }} onClick={updateTab(0)}>
-          One
-        </li>
-        <li classList={{ selected: tab() === 1 }} onClick={updateTab(1)}>
-          Two
-        </li>
-        <li classList={{ selected: tab() === 2 }} onClick={updateTab(2)}>
-          Three
-        </li>
+        {tabs.map(({ name, label }) => (
+          <li classList={{ selected: tab() === name }} onClick={updateTab(name)}>
+            {label}
+          </li>
+        ))}
       </ul>
       <div class="tab" classList={{ pending: pending() }}>
         <Suspense fallback={<div class="loader">Loading...</div>}>
           <Switch>
-            <Match when={tab() === 0}>
-              <Content page="One" />
-            </Match>
-            <Match when={tab() === 1}>
-              <Content page="Two" />
-            </Match>
-            <Match when={tab() === 2}>
-              <Content page="Three" />
-            </Match>
+            {tabs.map(({ name }) => (
+              <Match when={tab() === name}>
+                <Content page={name} />
+              </Match>
+            ))}
           </Switch>
         </Suspense>
       </div>
